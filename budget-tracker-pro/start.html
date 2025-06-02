@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget Tracker Pro - Personal Finance Manager</title>
+    <meta name="description" content="Take control of your finances with Budget Tracker Pro - Your comprehensive personal finance management solution">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💰</text></svg>">
+    
+    <!-- External Libraries -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            overflow: hidden;
+        }
+
+        .loading-container {
+            text-align: center;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .logo {
+            width: 120px;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo i {
+            font-size: 3rem;
+            color: white;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 3rem;
+            font-weight: 300;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 2rem;
+        }
+
+        .loading-text {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .progress-dots {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            animation: dotPulse 1.5s ease-in-out infinite;
+        }
+
+        .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes dotPulse {
+            0%, 100% { 
+                opacity: 0.5;
+                transform: scale(1);
+            }
+            50% { 
+                opacity: 1;
+                transform: scale(1.2);
+            }
+        }
+
+        .features {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 2rem;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .feature i {
+            color: #10b981;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .tagline {
+                font-size: 1rem;
+            }
+
+            .features {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-container">
+        <div class="logo">
+            <i class="fas fa-wallet"></i>
+        </div>
+        
+        <h1>Budget Tracker Pro</h1>
+        <p class="tagline">Your Personal Finance Manager</p>
+        
+        <div class="loading-spinner"></div>
+        
+        <p class="loading-text">Initializing your financial dashboard...</p>
+        
+        <div class="progress-dots">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+    </div>
+
+    <div class="features">
+        <div class="feature">
+            <i class="fas fa-shield-alt"></i>
+            <span>Secure & Private</span>
+        </div>
+        <div class="feature">
+            <i class="fas fa-mobile-alt"></i>
+            <span>Mobile Responsive</span>
+        </div>
+        <div class="feature">
+            <i class="fas fa-chart-line"></i>
+            <span>Real-time Analytics</span>
+        </div>
+    </div>
+
+    <script>
+        // Check if user is already logged in
+        function checkLoginStatus() {
+            const storedLogin = localStorage.getItem('userLogin') || sessionStorage.getItem('userLogin');
+            
+            if (storedLogin) {
+                const loginData = JSON.parse(storedLogin);
+                const loginTime = new Date(loginData.loginTime);
+                const now = new Date();
+                const hoursSinceLogin = (now - loginTime) / (1000 * 60 * 60);
+                
+                // Check if session is still valid
+                if (loginData.rememberMe && hoursSinceLogin < 24) {
+                    // Valid session, redirect to home
+                    return 'home.html';
+                } else if (!loginData.rememberMe && sessionStorage.getItem('userLogin')) {
+                    // Valid session storage
+                    return 'home.html';
+                } else {
+                    // Session expired, clear storage
+                    localStorage.removeItem('userLogin');
+                    sessionStorage.removeItem('userLogin');
+                }
+            }
+            
+            // No valid session, go to login
+            return 'login.html';
+        }
+
+        // Initialize application
+        function initializeApp() {
+            // Show loading for minimum time for better UX
+            const minLoadingTime = 2000;
+            const startTime = Date.now();
+            
+            // Determine redirect destination
+            const redirectTo = checkLoginStatus();
+            
+            // Calculate remaining loading time
+            const elapsedTime = Date.now() - startTime;
+            const remainingTime = Math.max(0, minLoadingTime - elapsedTime);
+            
+            setTimeout(() => {
+                // Fade out and redirect
+                document.body.style.transition = 'opacity 0.5s ease-out';
+                document.body.style.opacity = '0';
+                
+                setTimeout(() => {
+                    window.location.href = redirectTo;
+                }, 500);
+            }, remainingTime);
+        }
+
+        // Start initialization when page loads
+        document.addEventListener('DOMContentLoaded', initializeApp);
+
+        // Handle page visibility change (when user comes back to tab)
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                // Page became visible, check if we should redirect
+                const redirectTo = checkLoginStatus();
+                if (redirectTo !== window.location.pathname) {
+                    window.location.href = redirectTo;
+                }
+            }
+        });
+
+        // Prevent back button issues
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted) {
+                // Page was loaded from cache, reinitialize
+                initializeApp();
+            }
+        });
+    </script>
+</body>
+</html>

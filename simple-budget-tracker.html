@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget Tracker Pro - Simple Version</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Login Screen -->
+    <div id="loginScreen" class="min-h-screen flex items-center justify-center gradient-bg">
+        <div class="max-w-md w-full mx-4">
+            <div class="bg-white bg-opacity-25 backdrop-blur-lg rounded-xl shadow-lg p-8 border border-white border-opacity-20">
+                <div class="text-center mb-8">
+                    <h1 class="text-3xl font-bold text-white mb-2">💰 Budget Tracker Pro</h1>
+                    <p class="text-gray-200">Simple Demo Version</p>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-white mb-2">Email</label>
+                        <input type="email" id="email" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your email" value="demo@example.com">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-white mb-2">Password</label>
+                        <input type="password" id="password" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your password" value="demo123">
+                    </div>
+                    
+                    <button onclick="login()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200">
+                        Sign In
+                    </button>
+                </div>
+                
+                <div class="mt-6 p-4 bg-blue-100 rounded-lg">
+                    <p class="text-sm text-blue-800 font-medium">Demo Credentials:</p>
+                    <p class="text-xs text-blue-600">Email: demo@example.com</p>
+                    <p class="text-xs text-blue-600">Password: demo123</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="hidden min-h-screen bg-gray-50">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <h1 class="text-2xl font-bold text-gray-900">💰 Budget Tracker Pro</h1>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-gray-700">Welcome, Demo User!</span>
+                        <button onclick="logout()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg">
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="bg-white shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex space-x-8">
+                    <button onclick="showTab('overview')" id="tab-overview" class="py-4 px-1 border-b-2 border-blue-500 text-blue-600 font-medium text-sm">
+                        📊 Overview
+                    </button>
+                    <button onclick="showTab('add')" id="tab-add" class="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm">
+                        ➕ Add Transaction
+                    </button>
+                    <button onclick="showTab('analytics')" id="tab-analytics" class="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm">
+                        📈 Analytics
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Overview Tab -->
+            <div id="overview-tab" class="tab-content">
+                <!-- Summary Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-green-50 border-2 border-green-200 rounded-xl shadow-lg p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600 mb-1">Current Balance</p>
+                                <p id="balance" class="text-2xl font-bold text-green-600">$0.00</p>
+                            </div>
+                            <div class="text-3xl">💰</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-blue-50 border-2 border-blue-200 rounded-xl shadow-lg p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600 mb-1">Total Income</p>
+                                <p id="income" class="text-2xl font-bold text-green-600">$0.00</p>
+                            </div>
+                            <div class="text-3xl">📈</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-red-50 border-2 border-red-200 rounded-xl shadow-lg p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600 mb-1">Total Expenses</p>
+                                <p id="expenses" class="text-2xl font-bold text-red-600">$0.00</p>
+                            </div>
+                            <div class="text-3xl">📉</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Transactions -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-lg font-semibold mb-4">Recent Transactions</h3>
+                    <div id="recent-transactions" class="space-y-3">
+                        <p class="text-gray-500 text-center py-8">No transactions yet. Add some to get started!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Transaction Tab -->
+            <div id="add-tab" class="tab-content hidden">
+                <div class="max-w-md mx-auto bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-xl font-semibold mb-6 flex items-center">
+                        <span class="mr-3">➕</span>Add New Transaction
+                    </h2>
+                    
+                    <form onsubmit="addTransaction(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                            <input type="text" id="description" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="What was this for?" required>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Amount</label>
+                            <input type="number" id="amount" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0.00" step="0.01" min="0" required>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Type</label>
+                            <select id="type" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" onchange="updateCategories()">
+                                <option value="income">💰 Income</option>
+                                <option value="expense">💸 Expense</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                            <select id="category" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="salary">Salary</option>
+                                <option value="business">Business</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200">
+                            Add Transaction
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Analytics Tab -->
+            <div id="analytics-tab" class="tab-content hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h4 class="text-md font-semibold mb-4 text-center">💸 Expense Breakdown</h4>
+                        <div class="relative h-64">
+                            <canvas id="expenseChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h4 class="text-md font-semibold mb-4 text-center">💰 Income Sources</h4>
+                        <div class="relative h-64">
+                            <canvas id="incomeChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Sample data
+        let transactions = [
+            { id: 1, description: 'Monthly Salary', amount: 5000, type: 'income', category: 'salary', date: new Date() },
+            { id: 2, description: 'Grocery Shopping', amount: 150, type: 'expense', category: 'food', date: new Date() },
+            { id: 3, description: 'Rent Payment', amount: 1200, type: 'expense', category: 'rent', date: new Date() }
+        ];
+
+        let expenseChart, incomeChart;
+
+        // Categories
+        const categories = {
+            income: [
+                { value: 'salary', label: 'Salary' },
+                { value: 'business', label: 'Business' },
+                { value: 'investment', label: 'Investment' },
+                { value: 'other', label: 'Other' }
+            ],
+            expense: [
+                { value: 'food', label: 'Food & Dining' },
+                { value: 'rent', label: 'Rent & Housing' },
+                { value: 'utilities', label: 'Utilities' },
+                { value: 'transportation', label: 'Transportation' },
+                { value: 'entertainment', label: 'Entertainment' },
+                { value: 'shopping', label: 'Shopping' },
+                { value: 'other', label: 'Other' }
+            ]
+        };
+
+        // Login function
+        function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            if (email === 'demo@example.com' && password === 'demo123') {
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('dashboard').classList.remove('hidden');
+                updateSummary();
+                updateRecentTransactions();
+                updateCharts();
+            } else {
+                alert('Invalid credentials! Use demo@example.com / demo123');
+            }
+        }
+
+        // Logout function
+        function logout() {
+            document.getElementById('dashboard').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+        }
+
+        // Tab switching
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+            
+            // Remove active state from all tab buttons
+            document.querySelectorAll('[id^="tab-"]').forEach(btn => {
+                btn.className = 'py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm';
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName + '-tab').classList.remove('hidden');
+            
+            // Add active state to selected tab button
+            document.getElementById('tab-' + tabName).className = 'py-4 px-1 border-b-2 border-blue-500 text-blue-600 font-medium text-sm';
+            
+            if (tabName === 'analytics') {
+                setTimeout(updateCharts, 100); // Delay to ensure canvas is visible
+            }
+        }
+
+        // Update categories based on type
+        function updateCategories() {
+            const type = document.getElementById('type').value;
+            const categorySelect = document.getElementById('category');
+            
+            categorySelect.innerHTML = '';
+            categories[type].forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat.value;
+                option.textContent = cat.label;
+                categorySelect.appendChild(option);
+            });
+        }
+
+        // Add transaction
+        function addTransaction(event) {
+            event.preventDefault();
+            
+            const description = document.getElementById('description').value;
+            const amount = parseFloat(document.getElementById('amount').value);
+            const type = document.getElementById('type').value;
+            const category = document.getElementById('category').value;
+            
+            const newTransaction = {
+                id: Date.now(),
+                description,
+                amount,
+                type,
+                category,
+                date: new Date()
+            };
+            
+            transactions.push(newTransaction);
+            
+            // Reset form
+            document.getElementById('description').value = '';
+            document.getElementById('amount').value = '';
+            
+            // Update displays
+            updateSummary();
+            updateRecentTransactions();
+            updateCharts();
+            
+            // Show success message
+            alert('Transaction added successfully!');
+            
+            // Switch to overview tab
+            showTab('overview');
+        }
+
+        // Update summary cards
+        function updateSummary() {
+            const income = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+            const expenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+            const balance = income - expenses;
+            
+            document.getElementById('balance').textContent = formatCurrency(balance);
+            document.getElementById('income').textContent = formatCurrency(income);
+            document.getElementById('expenses').textContent = formatCurrency(expenses);
+            
+            // Update balance color
+            const balanceEl = document.getElementById('balance');
+            balanceEl.className = balance >= 0 ? 'text-2xl font-bold text-green-600' : 'text-2xl font-bold text-red-600';
+        }
+
+        // Update recent transactions
+        function updateRecentTransactions() {
+            const container = document.getElementById('recent-transactions');
+            
+            if (transactions.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center py-8">No transactions yet. Add some to get started!</p>';
+                return;
+            }
+            
+            const recentTransactions = transactions.slice(-5).reverse();
+            
+            container.innerHTML = recentTransactions.map(t => `
+                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div>
+                        <h4 class="font-medium text-gray-900">${t.description}</h4>
+                        <p class="text-sm text-gray-500 capitalize">${t.category}</p>
+                    </div>
+                    <div class="text-right">
+                        <div class="font-semibold ${t.type === 'income' ? 'text-green-600' : 'text-red-600'}">
+                            ${t.type === 'income' ? '+' : '-'}${formatCurrency(t.amount)}
+                        </div>
+                        <div class="text-xs text-gray-500 capitalize">${t.type}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Update charts
+        function updateCharts() {
+            updateExpenseChart();
+            updateIncomeChart();
+        }
+
+        // Update expense chart
+        function updateExpenseChart() {
+            const expensesByCategory = transactions
+                .filter(t => t.type === 'expense')
+                .reduce((acc, t) => {
+                    acc[t.category] = (acc[t.category] || 0) + t.amount;
+                    return acc;
+                }, {});
+            
+            const ctx = document.getElementById('expenseChart').getContext('2d');
+            
+            if (expenseChart) {
+                expenseChart.destroy();
+            }
+            
+            expenseChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(expensesByCategory).map(cat => cat.charAt(0).toUpperCase() + cat.slice(1)),
+                    datasets: [{
+                        data: Object.values(expensesByCategory),
+                        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update income chart
+        function updateIncomeChart() {
+            const incomeByCategory = transactions
+                .filter(t => t.type === 'income')
+                .reduce((acc, t) => {
+                    acc[t.category] = (acc[t.category] || 0) + t.amount;
+                    return acc;
+                }, {});
+            
+            const ctx = document.getElementById('incomeChart').getContext('2d');
+            
+            if (incomeChart) {
+                incomeChart.destroy();
+            }
+            
+            incomeChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(incomeByCategory).map(cat => cat.charAt(0).toUpperCase() + cat.slice(1)),
+                    datasets: [{
+                        data: Object.values(incomeByCategory),
+                        backgroundColor: ['#10B981', '#059669', '#047857', '#065F46'],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Format currency
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD'
+            }).format(amount);
+        }
+
+        // Initialize
+        updateCategories();
+    </script>
+</body>
+</html>

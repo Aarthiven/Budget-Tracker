@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Budget Tracker Pro</title>
+    <meta name="description" content="Your personal finance dashboard with income, expenses, and balance tracking">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💰</text></svg>">
+    
+    <!-- External Libraries -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .balance-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .balance-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+        }
+
+        .balance-card.income::before {
+            background: linear-gradient(90deg, #10b981, #059669);
+        }
+
+        .balance-card.expense::before {
+            background: linear-gradient(90deg, #ef4444, #dc2626);
+        }
+
+        .balance-card.balance::before {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .card-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 2rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-icon::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        .card-icon img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            filter: brightness(0) invert(1);
+        }
+
+        .income .card-icon {
+            background: linear-gradient(45deg, #10b981, #059669);
+        }
+
+        .expense .card-icon {
+            background: linear-gradient(45deg, #ef4444, #dc2626);
+        }
+
+        .balance .card-icon {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+        }
+
+        .card-title {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .card-amount {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .income .card-amount {
+            color: #10b981;
+        }
+
+        .expense .card-amount {
+            color: #ef4444;
+        }
+
+        .balance .card-amount.positive {
+            color: #10b981;
+        }
+
+        .balance .card-amount.negative {
+            color: #ef4444;
+        }
+
+        .card-subtitle {
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: #64748b;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #cbd5e1;
+        }
+
+        .empty-state h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: #475569;
+        }
+
+        .empty-state p {
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            justify-content: center;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .card-amount {
+                font-size: 2rem;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+        }
+
+        .notification {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: white;
+            border-radius: 10px;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #10b981;
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes shimmer {
+            0%, 100% {
+                transform: rotate(0deg);
+                opacity: 0.3;
+            }
+            50% {
+                transform: rotate(180deg);
+                opacity: 0.7;
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .balance-card:hover {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+
+
+        .data-insight {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 2.5rem;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .data-insight h3 {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .insight-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .insight-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .insight-item h4 {
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.9;
+        }
+
+        .insight-item .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-wallet"></i>
+                Budget Tracker Pro
+            </div>
+            <div class="user-info">
+                <span>Welcome back!</span>
+                <a href="setup.html?edit=true" class="btn btn-secondary">
+                    <i class="fas fa-cog"></i>
+                    Edit Budget
+                </a>
+                <a href="home.html" class="btn btn-secondary">
+                    <i class="fas fa-home"></i>
+                    Home
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="dashboard-grid">
+            <div class="balance-card income">
+                <div class="card-icon">
+                    <svg width="50" height="50" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="45" fill="rgba(255,255,255,0.2)"/>
+                        <path d="M30 60L50 40L70 60" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M35 50L50 35L65 50" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="50" cy="25" r="8" fill="white"/>
+                        <text x="50" y="30" text-anchor="middle" fill="#10b981" font-size="8" font-weight="bold">$</text>
+                    </svg>
+                </div>
+                <div class="card-title">Total Income</div>
+                <div class="card-amount" id="totalIncome">$0.00</div>
+                <div class="card-subtitle">💰 Monthly income sources</div>
+            </div>
+
+            <div class="balance-card expense">
+                <div class="card-icon">
+                    <svg width="50" height="50" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="45" fill="rgba(255,255,255,0.2)"/>
+                        <path d="M30 40L50 60L70 40" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M35 50L50 65L65 50" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="50" cy="75" r="8" fill="white"/>
+                        <text x="50" y="80" text-anchor="middle" fill="#ef4444" font-size="8" font-weight="bold">$</text>
+                    </svg>
+                </div>
+                <div class="card-title">Total Expenses</div>
+                <div class="card-amount" id="totalExpenses">$0.00</div>
+                <div class="card-subtitle">💸 Monthly expenses</div>
+            </div>
+
+            <div class="balance-card balance">
+                <div class="card-icon">
+                    <svg width="50" height="50" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="45" fill="rgba(255,255,255,0.2)"/>
+                        <rect x="25" y="35" width="50" height="30" rx="5" fill="white"/>
+                        <rect x="30" y="40" width="40" height="3" fill="#667eea"/>
+                        <rect x="30" y="47" width="25" height="2" fill="#94a3b8"/>
+                        <rect x="30" y="52" width="30" height="2" fill="#94a3b8"/>
+                        <circle cx="65" cy="45" r="3" fill="#667eea"/>
+                        <path d="M40 75L50 70L60 75" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div class="card-title">Current Balance</div>
+                <div class="card-amount" id="currentBalance">$0.00</div>
+                <div class="card-subtitle">🏦 Income minus expenses</div>
+            </div>
+        </div>
+
+        <div id="budgetContent" class="content-grid">
+            <!-- Content will be loaded here -->
+        </div>
+
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <i class="fas fa-chart-line"></i>
+            <h3>No Budget Setup Found</h3>
+            <p>It looks like you haven't set up your budget yet. Let's get started by adding your income and expenses.</p>
+            <div class="actions">
+                <a href="setup.html" class="btn btn-primary">
+                    <i class="fas fa-plus"></i>
+                    Setup Your Budget
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let budgetData = null;
+        let incomeChart = null;
+        let expenseChart = null;
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD'
+            }).format(amount);
+        }
+
+        function loadBudgetData() {
+            // Always show empty state - fresh start every time
+            showEmptyState();
+        }
+
+        function showEmptyState() {
+            document.getElementById('budgetContent').style.display = 'none';
+            document.getElementById('emptyState').style.display = 'block';
+        }
+
+        function displayBudgetData() {
+            if (!budgetData) {
+                console.log('No budget data found');
+                return;
+            }
+
+            console.log('Budget data loaded:', budgetData);
+
+            // Calculate totals
+            const totalIncome = budgetData.income.reduce((sum, item) => sum + item.amount, 0);
+            const totalExpenses = budgetData.expenses.reduce((sum, item) => sum + item.amount, 0);
+            const balance = totalIncome - totalExpenses;
+
+            console.log('Totals calculated:', { totalIncome, totalExpenses, balance });
+
+            // Update summary cards
+            document.getElementById('totalIncome').textContent = formatCurrency(totalIncome);
+            document.getElementById('totalExpenses').textContent = formatCurrency(totalExpenses);
+            
+            const balanceElement = document.getElementById('currentBalance');
+            balanceElement.textContent = formatCurrency(balance);
+            balanceElement.className = 'card-amount ' + (balance >= 0 ? 'positive' : 'negative');
+
+            // Show content
+            document.getElementById('budgetContent').style.display = 'grid';
+            document.getElementById('emptyState').style.display = 'none';
+
+            // Create content sections
+            createDataInsights();
+        }
+
+
+
+
+
+
+
+        function createDataInsights() {
+            const totalIncome = budgetData.income.reduce((sum, item) => sum + item.amount, 0);
+            const totalExpenses = budgetData.expenses.reduce((sum, item) => sum + item.amount, 0);
+            const balance = totalIncome - totalExpenses;
+            const savingsRate = totalIncome > 0 ? ((balance / totalIncome) * 100).toFixed(1) : 0;
+
+            // Find largest income source and expense
+            const largestIncome = budgetData.income.reduce((max, item) => item.amount > max.amount ? item : max, budgetData.income[0]);
+            const largestExpense = budgetData.expenses.reduce((max, item) => item.amount > max.amount ? item : max, budgetData.expenses[0]);
+
+            const insightsSection = document.createElement('div');
+            insightsSection.className = 'data-insight';
+            insightsSection.innerHTML = `
+                <h3>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9 11H15M9 15H15M17 21H7C5.89543 21 5 20.1046 5 19V5C5 3.89543 5.89543 3 7 3H12.5858C12.851 3 13.1054 3.10536 13.2929 3.29289L19.7071 9.70711C19.8946 9.89464 20 10.149 20 10.4142V19C20 20.1046 19.1046 21 18 21H17Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M13 3V9H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Financial Insights & Analysis
+                </h3>
+                <div class="insight-grid">
+                    <div class="insight-item">
+                        <h4>💾 Savings Rate</h4>
+                        <div class="value" style="color: ${balance >= 0 ? '#10b981' : '#ef4444'}">${savingsRate}%</div>
+                        <p style="font-size: 0.8rem; opacity: 0.8; margin-top: 0.5rem;">
+                            ${balance >= 0 ? 'Great job saving!' : 'Consider reducing expenses'}
+                        </p>
+                    </div>
+                    <div class="insight-item">
+                        <h4>📈 Top Income Source</h4>
+                        <div class="value">${largestIncome.name}</div>
+                        <p style="font-size: 0.8rem; opacity: 0.8; margin-top: 0.5rem;">
+                            ${formatCurrency(largestIncome.amount)} (${((largestIncome.amount / totalIncome) * 100).toFixed(1)}%)
+                        </p>
+                    </div>
+                    <div class="insight-item">
+                        <h4>📉 Largest Expense</h4>
+                        <div class="value">${largestExpense.name}</div>
+                        <p style="font-size: 0.8rem; opacity: 0.8; margin-top: 0.5rem;">
+                            ${formatCurrency(largestExpense.amount)} (${((largestExpense.amount / totalExpenses) * 100).toFixed(1)}%)
+                        </p>
+                    </div>
+                    <div class="insight-item">
+                        <h4>🎯 Financial Health</h4>
+                        <div class="value">${getFinancialHealthStatus(savingsRate)}</div>
+                        <p style="font-size: 0.8rem; opacity: 0.8; margin-top: 0.5rem;">
+                            ${getFinancialHealthTip(savingsRate)}
+                        </p>
+                    </div>
+                </div>
+                <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 10px;">
+                    <h4 style="margin-bottom: 0.5rem;">📊 Quick Analysis:</h4>
+                    <p style="font-size: 0.9rem; line-height: 1.5;">
+                        ${getQuickAnalysis(totalIncome, totalExpenses, balance, budgetData.income.length, budgetData.expenses.length)}
+                    </p>
+                </div>
+            `;
+            document.getElementById('budgetContent').appendChild(insightsSection);
+        }
+
+        function getFinancialHealthStatus(savingsRate) {
+            if (savingsRate >= 20) return "Excellent 🌟";
+            if (savingsRate >= 10) return "Good 👍";
+            if (savingsRate >= 0) return "Fair ⚖️";
+            return "Needs Attention ⚠️";
+        }
+
+        function getFinancialHealthTip(savingsRate) {
+            if (savingsRate >= 20) return "You're doing great! Keep it up!";
+            if (savingsRate >= 10) return "Good progress, aim for 20%";
+            if (savingsRate >= 0) return "Try to increase your savings";
+            return "Focus on reducing expenses";
+        }
+
+        function getQuickAnalysis(income, expenses, balance, incomeCount, expenseCount) {
+            let analysis = `You have ${incomeCount} income source${incomeCount > 1 ? 's' : ''} and ${expenseCount} expense categor${expenseCount > 1 ? 'ies' : 'y'}. `;
+
+            if (balance > 0) {
+                analysis += `You're saving ${formatCurrency(balance)} monthly, which is great for building your financial future! `;
+            } else if (balance < 0) {
+                analysis += `You're spending ${formatCurrency(Math.abs(balance))} more than you earn. Consider reviewing your expenses. `;
+            } else {
+                analysis += `You're breaking even. Try to create a small surplus for savings. `;
+            }
+
+            if (incomeCount === 1) {
+                analysis += `Consider diversifying your income sources for better financial security.`;
+            } else {
+                analysis += `Having multiple income sources provides good financial stability.`;
+            }
+
+            return analysis;
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}" style="color: ${type === 'success' ? '#10b981' : '#ef4444'};"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // No login check - fresh start every time
+        function checkLoginStatus() {
+            return true; // Always allow access
+        }
+
+        // Add logout functionality to header
+        function addLogoutToHeader() {
+            const userInfo = document.querySelector('.user-info');
+            if (userInfo) {
+                const logoutBtn = document.createElement('a');
+                logoutBtn.href = '#';
+                logoutBtn.className = 'btn btn-secondary';
+                logoutBtn.onclick = function(e) {
+                    e.preventDefault();
+                    if (confirm('Are you sure you want to logout?')) {
+                        localStorage.removeItem('userLogin');
+                        sessionStorage.removeItem('userLogin');
+                        window.location.href = 'login.html';
+                    }
+                };
+                logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
+                userInfo.appendChild(logoutBtn);
+            }
+        }
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check login first
+            if (!checkLoginStatus()) {
+                return;
+            }
+
+            // Add logout button
+            addLogoutToHeader();
+
+            // Load budget data
+            loadBudgetData();
+
+            // Show welcome notification if this is first visit
+            const hasVisited = localStorage.getItem('hasVisitedDashboard');
+            if (!hasVisited && budgetData) {
+                setTimeout(() => {
+                    showNotification('Welcome to your budget dashboard!');
+                    localStorage.setItem('hasVisitedDashboard', 'true');
+                }, 1000);
+            }
+        });
+    </script>
+</body>
+</html>
